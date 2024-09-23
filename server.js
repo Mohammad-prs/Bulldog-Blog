@@ -1,3 +1,1 @@
-server.get('/', (req, res) => {
-    res.send('Mohammadreza Parsafard - 121755235');
-});
+console.log("Mohammadreza Parsafard - 121755235") ;
