@@ -6,7 +6,7 @@ Student Email:  mparsafard@myseneca.ca
 Date Created:  September 23th , 2024
 
 GITHUB URL:  https://github.com/Mohammad-prs
-VERCEL URL:   
+VERCEL URL:  https://web322-assignment-1-mfc3-git-master-mohammad-prs-projects.vercel.app/
 
 ### Technology Stack
 
