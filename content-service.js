@@ -17,50 +17,29 @@ let categories = [];
 // Function to initialize
 function initialize() {
     return new Promise((resolve, reject) => {
-        
-        fs.readFile(path.join(__dirname, 'data', 'articles.json'), 'utf8', (err, data) => {
+        const articlesFilePath = path.resolve(__dirname, 'data', 'articles.json');
+        const categoriesFilePath = path.resolve(__dirname, 'data', 'categories.json');
+
+        // Read articles.json file
+        fs.readFile(articlesFilePath, 'utf8', (err, data) => {
             if (err) {
                 reject('Unable to read articles file');
             } else {
                 articles = JSON.parse(data);
-                
-                
-                fs.readFile(path.join(__dirname, 'data', 'categories.json'), 'utf8', (err, data) => {
+
+                // Read categories.json file
+                fs.readFile(categoriesFilePath, 'utf8', (err, data) => {
                     if (err) {
                         reject('Unable to read categories file');
                     } else {
                         categories = JSON.parse(data);
-                        resolve();
+                        resolve(); // All data has been loaded
                     }
                 });
             }
         });
     });
 }
-
-// Function to initialize
-function initialize() {
-    return new Promise((resolve, reject) => {
-        fs.readFile(path.join(__dirname, 'data', 'articles.json'), 'utf8', (err, data) => {
-            if (err) {
-                reject('Unable to read articles file');
-            } else {
-                articles = JSON.parse(data);
-                fs.readFile(path.join(__dirname, 'data', 'categories.json'), 'utf8', (err, data) => {
-                    if (err) {
-                        reject('Unable to read categories file');
-                    } else {
-                        categories = JSON.parse(data);
-                        resolve();
-                    }
-                });
-            }
-        });
-    });
-}
-
-
-
 
 // Function to get only the published articles
 function getPublishedArticles() {
