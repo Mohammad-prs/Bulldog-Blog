@@ -1,3 +1,13 @@
+/*
+    Full Name: Mohammadreza Parsafard
+    Student Number: 121755235
+    Student Email: mparsafard@myseneca.ca
+    File Name: server.js
+    Date Created: September 23th , 2024
+    Last Modified: October14th , 2024
+*/
+
+
 const express = require('express');
 const path = require('path');
 const contentService = require('./content-service');  // Import the content service
@@ -6,7 +16,7 @@ const app = express();
 const port = process.env.PORT || 3243;
 
 // Serve static files from the public folder
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Redirect root route ('/') to '/about'
 app.get('/', (req, res) => {

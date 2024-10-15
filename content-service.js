@@ -1,3 +1,12 @@
+/*
+    Full Name: Mohammadreza Parsafard
+    Student Number: 121755235
+    Student Email: mparsafard@myseneca.ca
+    File Name: content-service.js
+    Date Created: October14th , 2024
+    Last Modified: October14th , 2024
+*/
+
 const fs = require('fs');
 const path = require('path');
 
