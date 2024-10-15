@@ -1,12 +1,19 @@
 const express = require('express');
+const path = require('path'); 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3243;
+
+
+app.use(express.static('public'));
 
 app.get('/', (req, res) => {
-    res.send('Name : Mohammadreza Parsafard - Student ID : 121755235');
+    res.redirect('/about');
+});
+
+app.get('/about', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'about.html'));
 });
 
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+    console.log(`Express http server listening on port ${port}`);
 });
-
