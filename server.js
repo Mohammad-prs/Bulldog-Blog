@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const contentService = require('./content-service');  // Import the content service
 
 const app = express();
 const port = process.env.PORT || 3243;
@@ -17,17 +18,27 @@ app.get('/about', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'about.html'));
 });
 
-// Serve articles.json for /articles route
+// Route to fetch published articles from content-service
 app.get('/articles', (req, res) => {
-    res.sendFile(path.join(__dirname, 'data', 'articles.json'));
+    contentService.getPublishedArticles()
+        .then((articles) => res.json(articles))
+        .catch((err) => res.json({ message: err }));
 });
 
-// Serve categories.json for /categories route
+// Route to fetch all categories from content-service
 app.get('/categories', (req, res) => {
-    res.sendFile(path.join(__dirname, 'data', 'categories.json'));
+    contentService.getCategories()
+        .then((categories) => res.json(categories))
+        .catch((err) => res.json({ message: err }));
 });
 
-// Start the server
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
+// Initialize the content service and start the server
+contentService.initialize()
+    .then(() => {
+        app.listen(port, () => {
+            console.log(`Express http server listening on port ${port}`);
+        });
+    })
+    .catch(err => {
+        console.error('Failed to initialize content service:', err);
+    });
