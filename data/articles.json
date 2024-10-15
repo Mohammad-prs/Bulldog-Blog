@@ -1,0 +1,23 @@
+[
+    {
+        "id": 1,
+        "title": "The Charming and Sturdy English Bulldog",
+        "content": "English Bulldogs are known for their distinct wrinkled faces, muscular build, and gentle demeanor. Despite their tough appearance, they are affectionate companions that make great family pets. Learn about their care needs, common health issues, and why they are beloved around the world.",
+        "published": true,
+        "category": "Family-Friendly"
+    },
+    {
+        "id": 2,
+        "title": "Meet the Compact and Playful company : French Bulldog",
+        "content": "French Bulldogs are small in size but big in personality. Known for their bat-like ears and charming nature, they are one of the most popular small dog breeds. This article explores their history, temperament, and the best ways to care for your Frenchie.",
+        "published": false,
+        "category": "Small Breeds"
+    },
+    {
+        "id": 3,
+        "title": "The Athletic and Loyal American Bulldog",
+        "content": "American Bulldogs are larger and more active compared to their English and French counterparts. With their muscular build and high energy, they are great companions for active families. This article covers their exercise requirements, training tips, and how to keep them healthy.",
+        "published": true,
+        "category": "Active Breeds"
+    }
+]
