@@ -71,3 +71,39 @@ module.exports = {
     getCategories
 };
 
+
+module.exports.addArticle = (articleData) => {
+    return new Promise((resolve, reject) => {
+        articleData.published = articleData.published === "true";
+        articleData.id = articles.length + 1; // Assign a unique ID
+        articles.push(articleData);
+        resolve(articleData);
+    });
+};
+
+
+
+module.exports.getArticlesByCategory = (category) => {
+    return new Promise((resolve, reject) => {
+        const filteredArticles = articles.filter(article => article.category == category);
+        if (filteredArticles.length > 0) resolve(filteredArticles);
+        else reject("no results returned");
+    });
+};
+
+module.exports.getArticlesByMinDate = (minDateStr) => {
+    return new Promise((resolve, reject) => {
+        const minDate = new Date(minDateStr);
+        const filteredArticles = articles.filter(article => new Date(article.articleDate) >= minDate);
+        if (filteredArticles.length > 0) resolve(filteredArticles);
+        else reject("no results returned");
+    });
+};
+
+module.exports.getArticleById = (id) => {
+    return new Promise((resolve, reject) => {
+        const foundArticle = articles.find(article => article.id == id);
+        if (foundArticle) resolve(foundArticle);
+        else reject("no results returned");
+    });
+};
