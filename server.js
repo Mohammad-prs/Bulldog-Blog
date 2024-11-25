@@ -15,6 +15,10 @@ const contentService = require('./content-service');  // Import the content serv
 const app = express();
 const port = process.env.PORT || 3243;
 
+app.set('view engine', 'ejs'); // Specify EJS as the view engine
+app.set('views', path.join(__dirname, 'views')); // Define the views directory
+
+
 // Serve static files from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -25,14 +29,13 @@ app.get('/', (req, res) => {
 
 // Serve about.html when '/about' is accessed
 app.get('/about', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'about.html'));
+    res.render('about');
 });
 
 // Serve addArticle.html when '/articles/add' is accessed
 app.get('/articles/add', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'addArticle.html'));
+    res.render('addArticle'); // Looks for addArticle.ejs in the views directory
 });
-
 
 // Route to fetch published articles from content-service
 app.get('/articles', (req, res) => {
