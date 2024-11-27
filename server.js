@@ -83,9 +83,14 @@ app.get('/article/:id', (req, res) => {
 // Route to fetch all categories from content-service
 app.get('/categories', (req, res) => {
     contentService.getCategories()
-        .then((categories) => res.json(categories))
-        .catch((err) => res.json({ message: err }));
+        .then(categories => {
+            res.render('categories', { categories });
+        })
+        .catch(err => {
+            res.render('categories', { categories: [] }); // Render empty if error
+        });
 });
+
 
 // Initialize the content service and start the server
 contentService.initialize()
