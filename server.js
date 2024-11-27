@@ -40,19 +40,35 @@ app.get('/articles/add', (req, res) => {
 // Route to fetch published articles from content-service
 app.get('/articles', (req, res) => {
     if (req.query.category) {
+        // Fetch articles filtered by category
         contentService.getArticlesByCategory(req.query.category)
-            .then(articles => res.json(articles))
-            .catch(err => res.status(500).json({ message: err }));
+            .then(articles => {
+                res.render('articles', { articles });
+            })
+            .catch(err => {
+                res.render('articles', { articles: [] }); // Render empty table if error
+            });
     } else if (req.query.minDate) {
+        // Fetch articles filtered by minimum date
         contentService.getArticlesByMinDate(req.query.minDate)
-            .then(articles => res.json(articles))
-            .catch(err => res.status(500).json({ message: err }));
+            .then(articles => {
+                res.render('articles', { articles });
+            })
+            .catch(err => {
+                res.render('articles', { articles: [] });
+            });
     } else {
+        // Fetch all published articles
         contentService.getPublishedArticles()
-            .then(articles => res.json(articles))
-            .catch(err => res.status(500).json({ message: err }));
+            .then(articles => {
+                res.render('articles', { articles });
+            })
+            .catch(err => {
+                res.render('articles', { articles: [] });
+            });
     }
 });
+
 
 app.get('/article/:id', (req, res) => {
     contentService.getArticleById(req.params.id)
