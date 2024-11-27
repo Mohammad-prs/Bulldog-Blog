@@ -3,8 +3,8 @@
     Student Number: 121755235
     Student Email: mparsafard@myseneca.ca
     File Name: content-service.js
-    Date Created: October14th , 2024
-    Last Modified: November 18th , 2024
+    Date Created: October 14th, 2024
+    Last Modified: November 18th, 2024
 */
 
 const fs = require('fs');
@@ -14,26 +14,24 @@ const path = require('path');
 let articles = [];
 let categories = [];
 
-// Function to initialize
+// Function to initialize the data
 function initialize() {
     return new Promise((resolve, reject) => {
         const articlesFilePath = path.resolve(__dirname, 'data', 'articles.json');
         const categoriesFilePath = path.resolve(__dirname, 'data', 'categories.json');
 
-        // Read articles.json file
         fs.readFile(articlesFilePath, 'utf8', (err, data) => {
             if (err) {
                 reject('Unable to read articles file');
             } else {
                 articles = JSON.parse(data);
 
-                // Read categories.json file
                 fs.readFile(categoriesFilePath, 'utf8', (err, data) => {
                     if (err) {
                         reject('Unable to read categories file');
                     } else {
                         categories = JSON.parse(data);
-                        resolve(); // All data has been loaded
+                        resolve();
                     }
                 });
             }
@@ -41,7 +39,7 @@ function initialize() {
     });
 }
 
-// Function to get only the published articles
+// Function to get only published articles
 function getPublishedArticles() {
     return new Promise((resolve, reject) => {
         const publishedArticles = articles.filter(article => article.published === true);
@@ -49,6 +47,43 @@ function getPublishedArticles() {
             resolve(publishedArticles);
         } else {
             reject('No published articles found');
+        }
+    });
+}
+
+// Function to get articles by category
+function getArticlesByCategory(category) {
+    return new Promise((resolve, reject) => {
+        const filteredArticles = articles.filter(article => article.category == category);
+        if (filteredArticles.length > 0) {
+            resolve(filteredArticles);
+        } else {
+            reject('No results returned');
+        }
+    });
+}
+
+// Function to get articles by minimum date
+function getArticlesByMinDate(minDateStr) {
+    return new Promise((resolve, reject) => {
+        const minDate = new Date(minDateStr);
+        const filteredArticles = articles.filter(article => new Date(article.articleDate) >= minDate);
+        if (filteredArticles.length > 0) {
+            resolve(filteredArticles);
+        } else {
+            reject('No results returned');
+        }
+    });
+}
+
+// Function to get an article by ID
+function getArticleById(id) {
+    return new Promise((resolve, reject) => {
+        const foundArticle = articles.find(article => article.id == id);
+        if (foundArticle) {
+            resolve(foundArticle);
+        } else {
+            reject('No results returned');
         }
     });
 }
@@ -64,46 +99,23 @@ function getCategories() {
     });
 }
 
-// Export the functions for use in other modules
-module.exports = {
-    initialize,
-    getPublishedArticles,
-    getCategories
-};
-
-
-module.exports.addArticle = (articleData) => {
+// Function to add a new article
+function addArticle(articleData) {
     return new Promise((resolve, reject) => {
         articleData.published = articleData.published === "true";
         articleData.id = articles.length + 1; // Assign a unique ID
         articles.push(articleData);
         resolve(articleData);
     });
-};
+}
 
-
-
-module.exports.getArticlesByCategory = (category) => {
-    return new Promise((resolve, reject) => {
-        const filteredArticles = articles.filter(article => article.category == category);
-        if (filteredArticles.length > 0) resolve(filteredArticles);
-        else reject("no results returned");
-    });
-};
-
-module.exports.getArticlesByMinDate = (minDateStr) => {
-    return new Promise((resolve, reject) => {
-        const minDate = new Date(minDateStr);
-        const filteredArticles = articles.filter(article => new Date(article.articleDate) >= minDate);
-        if (filteredArticles.length > 0) resolve(filteredArticles);
-        else reject("no results returned");
-    });
-};
-
-module.exports.getArticleById = (id) => {
-    return new Promise((resolve, reject) => {
-        const foundArticle = articles.find(article => article.id == id);
-        if (foundArticle) resolve(foundArticle);
-        else reject("no results returned");
-    });
+// Export the functions
+module.exports = {
+    initialize,
+    getPublishedArticles,
+    getArticlesByCategory,
+    getArticlesByMinDate,
+    getArticleById,
+    getCategories,
+    addArticle
 };
