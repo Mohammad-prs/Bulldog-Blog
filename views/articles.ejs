@@ -58,12 +58,14 @@
                         <th>Title</th>
                         <th>Category</th>
                         <th>Article Date</th>
+                        <th>Published</th> <!-- New Published Column -->
                     </tr>
                 </thead>
                 <tbody>
                     <% articles.forEach(article => { %>
                         <tr>
                             <td>
+                                <!-- Link the title to the article page -->
                                 <a href="/article/<%= article.id %>"><%= article.title %></a>
                             </td>
                             <td>
@@ -71,6 +73,9 @@
                                 <a href="/articles?category=<%= article.category %>"><%= article.category %></a>
                             </td>
                             <td><%= article.articleDate %></td>
+                            <td class="<%= article.published ? 'text-success' : 'text-danger' %>">
+                                <%= article.published ? 'Yes' : 'No' %>
+                            </td>
                         </tr>
                     <% }); %>
                 </tbody>

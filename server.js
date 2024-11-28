@@ -45,50 +45,48 @@ app.get('/articles/add', (req, res) => {
 });
 
 
-// Route to fetch published articles from content-service
+// Route to fetch all articles from content-service
 app.get('/articles', (req, res) => {
     if (req.query.category) {
-        // Fetch articles filtered by category
+        // Filter articles by category
         contentService.getArticlesByCategory(req.query.category)
-            .then(articles => {
-                res.render('articles', { articles });
-            })
-            .catch(err => {
-                res.render('articles', { articles: [] }); // Render empty table if error
-            });
+            .then(articles => res.render('articles', { articles }))
+            .catch(err => res.render('articles', { articles: [] }));
     } else if (req.query.minDate) {
-        // Fetch articles filtered by minimum date
+        // Filter articles by minimum date
         contentService.getArticlesByMinDate(req.query.minDate)
-            .then(articles => {
-                res.render('articles', { articles });
-            })
-            .catch(err => {
-                res.render('articles', { articles: [] });
-            });
+            .then(articles => res.render('articles', { articles }))
+            .catch(err => res.render('articles', { articles: [] }));
     } else {
-        // Fetch all published articles
-        contentService.getPublishedArticles()
-            .then(articles => {
-                res.render('articles', { articles });
-            })
-            .catch(err => {
-                res.render('articles', { articles: [] });
-            });
+        // Fetch all articles (include both published and unpublished)
+        contentService.getAllArticles() // Ensure this function is used
+            .then(articles => res.render('articles', { articles }))
+            .catch(err => res.render('articles', { articles: [] }));
     }
 });
 
 
+// Route to fetch an article by ID
 app.get('/article/:id', (req, res) => {
     contentService.getArticleById(req.params.id)
         .then(article => {
+            // If the article is not published, redirect to 404 page
             if (!article.published) {
-                res.render('article', { article }); // Show unpublished error message
+                res.status(404).render('articles', {
+                    articles: [],
+                    message: "The requested article is not available because it is unpublished."
+                });
             } else {
-                res.render('article', { article }); // Render valid article
+                // Render the article if published
+                res.render('article', { article });
             }
         })
         .catch(err => {
-            res.render('article', { article: null }); // Render error message
+            // Handle invalid article ID or other errors
+            res.status(404).render('articles', {
+                articles: [],
+                message: "The requested article could not be found."
+            });
         });
 });
 

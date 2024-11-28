@@ -10,10 +10,9 @@
     {
         "id": 3,
         "name": "Active Breeds"
+    },
+    {
+        "id": 4,
+        "name": "Exotic Breeds"
     }
 ]
-
-
-
-
-

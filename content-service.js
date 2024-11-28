@@ -109,6 +109,29 @@ function addArticle(articleData) {
     });
 }
 
+// Function to get all articles (without filtering by published status)
+// module.exports.getAllArticles = () => {
+//     return new Promise((resolve, reject) => {
+//         if (articles.length > 0) {
+//             resolve(articles);
+//         } else {
+//             reject('No articles found');
+//         }
+//     });
+// };
+
+function getAllArticles () {
+    return new Promise((resolve, reject) => {
+        if (articles.length > 0) {
+            resolve(articles);
+        } else {
+            reject('No articles found');
+        }
+    });
+
+}
+
+
 // Export the functions
 module.exports = {
     initialize,
@@ -117,5 +140,6 @@ module.exports = {
     getArticlesByMinDate,
     getArticleById,
     getCategories,
-    addArticle
+    addArticle,
+    getAllArticles
 };

@@ -22,6 +22,22 @@
         "published": true,
         "category": "Active Breeds",
         "articleDate": "2024-03-01"
+    }, 
+    {
+        "id": 4,
+        "title": "The Gentle and Calm Victorian Bulldog",
+        "content": "Victorian Bulldogs are a modern breed developed to retain the charm of the traditional bulldog while reducing health issues. They are known for their calm temperament, loyalty, and suitability for families with children. This article highlights their history, care needs, and personality traits.",
+        "published": false,
+        "category": "Family-Friendly",
+        "articleDate": "2024-04-15"
+    },
+    {
+        "id": 5,
+        "title": "The Exotic and Rare Alapaha Blue Blood Bulldog",
+        "content": "Alapaha Blue Blood Bulldogs are a rare breed known for their striking appearance and strong guarding instincts. This article explores their origins in the southern United States, their protective nature, and the commitment required to care for this unique breed.",
+        "published": false,
+        "category": "Exotic Breeds",
+        "articleDate": "2024-05-10"
     }
 ]
 
