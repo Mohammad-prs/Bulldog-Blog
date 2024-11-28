@@ -31,12 +31,14 @@ cd your repository name
 
 3. Run the application:
 
-4. Access the following routes in your browser:
+4.Access the Application:
 
 Home (Redirects to About): http://localhost:3243/
 About Page: http://localhost:3243/about
-Articles (JSON): http://localhost:3243/articles
-Categories (JSON): http://localhost:3243/categories
+Articles List: http://localhost:3243/articles
+Categories List: http://localhost:3243/categories
+Add Article: http://localhost:3243/articles/add
+View Article: http://localhost:3243/article/:id (replace :id with a valid article ID)
 
 
 ### Features and Updates
