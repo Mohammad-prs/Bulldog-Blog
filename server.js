@@ -33,9 +33,17 @@ app.get('/about', (req, res) => {
 });
 
 // Serve addArticle.html when '/articles/add' is accessed
+// Route to serve the Add Article page
 app.get('/articles/add', (req, res) => {
-    res.render('addArticle'); // Looks for addArticle.ejs in the views directory
+    contentService.getCategories()
+        .then(categories => {
+            res.render('addArticle', { categories });
+        })
+        .catch(err => {
+            res.render('addArticle', { categories: [] }); // Handle error by rendering an empty list
+        });
 });
+
 
 // Route to fetch published articles from content-service
 app.get('/articles', (req, res) => {
