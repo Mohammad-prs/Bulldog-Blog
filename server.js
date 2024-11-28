@@ -72,9 +72,18 @@ app.get('/articles', (req, res) => {
 
 app.get('/article/:id', (req, res) => {
     contentService.getArticleById(req.params.id)
-        .then(article => res.json(article))
-        .catch(err => res.status(500).json({ message: err }));
+        .then(article => {
+            if (!article.published) {
+                res.render('article', { article }); // Show unpublished error message
+            } else {
+                res.render('article', { article }); // Render valid article
+            }
+        })
+        .catch(err => {
+            res.render('article', { article: null }); // Render error message
+        });
 });
+
 
 
 
