@@ -25,11 +25,26 @@ function initialize() {
 }
 
 // Function to get all articles
-function getAllArticles() {
+function getAllArticles () {
     return pool.query('SELECT * FROM articles')
-        .then(res => res.rows)
+        .then(res => {
+            return res.rows.map(article => {
+                if (article.articledate) {
+                    // Format the date to YYYY-MM-DD
+                    article.articleDate = new Date(article.articledate).toISOString().split('T')[0];
+                } else {
+                    article.articleDate = null;
+                }
+                return article;
+            });
+        })
         .catch(err => Promise.reject('No articles found'));
-}
+};
+
+
+
+
+
 
 // Function to get only published articles
 function getPublishedArticles() {
@@ -89,6 +104,44 @@ function addArticle(articleData) {
         .catch(err => Promise.reject('Unable to add article'));
 }
 
+
+function updateArticle (id, articleData) {
+    return new Promise((resolve, reject) => {
+        const query = `
+            UPDATE articles
+            SET title = $1, content = $2, published = $3, category = $4, articledate = $5
+            WHERE id = $6
+        `;
+        const values = [
+            articleData.title,
+            articleData.content,
+            articleData.published === 'true',
+            articleData.category,
+            articleData.articleDate || new Date(),
+            id
+        ];
+
+        pool.query(query, values)
+            .then(() => resolve())
+            .catch(err => reject('Error updating article'));
+    });
+};
+
+
+function deleteArticle (id) {
+    return new Promise((resolve, reject) => {
+        const query = `DELETE FROM articles WHERE id = $1`;
+        const values = [id];
+
+        pool.query(query, values)
+            .then(() => resolve())
+            .catch(err => reject('Error deleting article'));
+    });
+};
+
+
+
+
 // Export the functions
 module.exports = {
     initialize,
@@ -98,5 +151,7 @@ module.exports = {
     getArticlesByMinDate,
     getArticleById,
     getCategories,
-    addArticle
+    addArticle,
+    deleteArticle,
+    updateArticle
 };

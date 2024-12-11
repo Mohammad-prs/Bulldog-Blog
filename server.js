@@ -3,37 +3,56 @@
     Student Number: 121755235
     Student Email: mparsafard@myseneca.ca
     File Name: server.js
-    Date Created: September 23th , 2024
-    Last Modified: November 18th , 2024
+    Date Created: September 23th, 2024
+    Last Modified: December 12th, 2024
 */
+
 
 
 const express = require('express');
 const path = require('path');
-const contentService = require('./content-service');  // Import the content service
+const contentService = require('./content-service'); // Import the content service
+const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
+const streamifier = require('streamifier');
 
 const app = express();
 const port = process.env.PORT || 3243;
 
 app.set('view engine', 'ejs'); // Specify EJS as the view engine
 app.set('views', path.join(__dirname, 'views')); // Define the views directory
+const methodOverride = require('method-override');
+app.use(methodOverride('_method')); // Enables overriding methods
+
 
 
 // Serve static files from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Middleware to parse JSON body for PUT/POST requests
+app.use(express.json());
+
+// Cloudinary configuration for image uploads
+cloudinary.config({
+    cloud_name: 'dgrxqragr',
+    api_key: '876523627773131',
+    api_secret: 'Jr8Sh8TGEWms2cJA87tpgQD5T1o',
+    secure: true
+});
+
+const upload = multer(); // No disk storage, files are stored in memory
 
 // Redirect root route ('/') to '/about'
 app.get('/', (req, res) => {
     res.redirect('/about');
 });
 
-// Serve about.html when '/about' is accessed
+// About page
 app.get('/about', (req, res) => {
     res.render('about');
 });
 
-// Serve addArticle.html when '/articles/add' is accessed
-// Route to serve the Add Article page
+// Add Article page
 app.get('/articles/add', (req, res) => {
     contentService.getCategories()
         .then(categories => {
@@ -44,58 +63,78 @@ app.get('/articles/add', (req, res) => {
         });
 });
 
+// Add Article POST route
+app.post('/articles/add', upload.single('featureImage'), (req, res) => {
+    const processArticle = (imageUrl) => {
+        req.body.featureImage = imageUrl;
+        contentService.addArticle(req.body)
+            .then(() => res.redirect('/articles'))
+            .catch(err => res.status(500).json({ message: 'Article creation failed', error: err }));
+    };
 
-// Route to fetch all articles from content-service
+    if (req.file) {
+        let streamUpload = (req) => {
+            return new Promise((resolve, reject) => {
+                let stream = cloudinary.uploader.upload_stream((error, result) => {
+                    if (result) resolve(result);
+                    else reject(error);
+                });
+                streamifier.createReadStream(req.file.buffer).pipe(stream);
+            });
+        };
+
+        async function upload(req) {
+            let result = await streamUpload(req);
+            return result;
+        }
+
+        upload(req)
+            .then(uploaded => processArticle(uploaded.url))
+            .catch(err => res.status(500).json({ message: 'Image upload failed', error: err }));
+    } else {
+        processArticle('');
+    }
+});
+
+// Fetch all articles
 app.get('/articles', (req, res) => {
-    if (req.query.category) {
-        // Filter articles by category
-        contentService.getArticlesByCategory(req.query.category)
+    const { category, minDate } = req.query;
+
+    if (category) {
+        contentService.getArticlesByCategory(category)
             .then(articles => res.render('articles', { articles }))
             .catch(err => res.render('articles', { articles: [] }));
-    } else if (req.query.minDate) {
-        // Filter articles by minimum date
-        contentService.getArticlesByMinDate(req.query.minDate)
+    } else if (minDate) {
+        contentService.getArticlesByMinDate(minDate)
             .then(articles => res.render('articles', { articles }))
             .catch(err => res.render('articles', { articles: [] }));
     } else {
-        // Fetch all articles (include both published and unpublished)
-        contentService.getAllArticles() // Ensure this function is used
+        contentService.getAllArticles()
             .then(articles => res.render('articles', { articles }))
             .catch(err => res.render('articles', { articles: [] }));
     }
 });
 
-
-// Route to fetch an article by ID
+// Fetch an article by ID
 app.get('/article/:id', (req, res) => {
     contentService.getArticleById(req.params.id)
         .then(article => {
-            // If the article is not published, redirect to 404 page
             if (!article.published) {
                 res.status(404).render('articles', {
                     articles: [],
-                    message: "The requested article is not available because it is unpublished."
+                    message: 'The requested article is not available because it is unpublished.'
                 });
             } else {
-                // Render the article if published
                 res.render('article', { article });
             }
         })
-        .catch(err => {
-            // Handle invalid article ID or other errors
-            res.status(404).render('articles', {
-                articles: [],
-                message: "The requested article could not be found."
-            });
-        });
+        .catch(err => res.status(404).render('articles', {
+            articles: [],
+            message: 'The requested article could not be found.'
+        }));
 });
 
-
-
-
-
-
-// Route to fetch all categories from content-service
+// Fetch all categories
 app.get('/categories', (req, res) => {
     contentService.getCategories()
         .then(categories => {
@@ -105,6 +144,60 @@ app.get('/categories', (req, res) => {
             res.render('categories', { categories: [] }); // Render empty if error
         });
 });
+
+// Route to update an article
+app.put('/articles/:id', (req, res) => {
+    contentService.updateArticle(req.params.id, req.body)
+        .then(() => {
+            res.redirect('/articles'); // Redirect to the articles page after update
+        })
+        .catch(err => {
+            res.status(500).send('Error updating article');
+        });
+});
+
+// Route to delete an article
+app.delete('/articles/:id', (req, res) => {
+    contentService.deleteArticle(req.params.id)
+        .then(() => {
+            res.redirect('/articles'); // Redirect to the articles page after deletion
+        })
+        .catch(err => {
+            res.status(500).send('Error deleting article');
+        });
+});
+
+
+
+
+app.get('/articles/edit/:id', (req, res) => {
+    Promise.all([
+        contentService.getArticleById(req.params.id),
+        contentService.getCategories()
+    ])
+    .then(([article, categories]) => {
+        res.render('editArticle', { article, categories });
+    })
+    .catch(err => {
+        res.status(404).send('Article not found.');
+    });
+});
+
+// Route to display the Edit Article page
+app.get('/articles/edit/:id', (req, res) => {
+    Promise.all([
+        contentService.getArticleById(req.params.id),
+        contentService.getCategories()
+    ])
+    .then(([article, categories]) => {
+        res.render('editArticle', { article, categories });
+    })
+    .catch(err => {
+        res.status(500).send('Error loading edit page');
+    });
+});
+
+
 
 
 // Initialize the content service and start the server
@@ -117,77 +210,3 @@ contentService.initialize()
     .catch(err => {
         console.error('Failed to initialize content service:', err);
     });
-
-
-
-    
-    
-    const multer = require("multer");
-    const cloudinary = require('cloudinary').v2;
-    const streamifier = require('streamifier');
-    
-    cloudinary.config({
-        cloud_name: 'dgrxqragr',
-        api_key: '876523627773131',
-        api_secret: 'Jr8Sh8TGEWms2cJA87tpgQD5T1o',
-        secure: true
-    });
-    
-    const upload = multer(); // No disk storage, files are stored in memory
-    
-
-
-    // Route to handle form submission for adding a new article
-app.post('/articles/add', upload.single("featureImage"), (req, res) => {
-    // Check if a file (image) was uploaded
-    if (req.file) {
-        // Function to upload the file to Cloudinary using a stream
-        let streamUpload = (req) => {
-            return new Promise((resolve, reject) => {
-                // Create an upload stream to Cloudinary
-                let stream = cloudinary.uploader.upload_stream((error, result) => {
-                    if (result) resolve(result); // Resolve the promise if upload is successful
-                    else reject(error);         // Reject the promise if there's an error
-                });
-
-                // Stream the file buffer to Cloudinary
-                streamifier.createReadStream(req.file.buffer).pipe(stream);
-            });
-        };
-
-        // Asynchronous function to upload the file and return the result
-        async function upload(req) {
-            let result = await streamUpload(req);
-            return result;
-        }
-
-        // Upload the file and handle the result
-        upload(req).then((uploaded) => {
-            // Process the article with the uploaded image URL
-            processArticle(uploaded.url);
-        }).catch(err => {
-            // Handle errors during the file upload
-            res.status(500).json({ message: "Image upload failed", error: err });
-        });
-    } else {
-        // If no file was uploaded, proceed without an image URL
-        processArticle("");
-    }
-
-    // Function to process the article and save it
-    function processArticle(imageUrl) {
-        // Add the image URL to the request body
-        req.body.featureImage = imageUrl;
-
-        // Add the new article to the content-service
-        contentService.addArticle(req.body)
-            .then(() => {
-                // Redirect to the /articles route after successful addition
-                res.redirect('/articles');
-            })
-            .catch(err => {
-                // Handle errors during article creation
-                res.status(500).json({ message: "Article creation failed", error: err });
-            });
-    }
-});

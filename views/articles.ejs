@@ -58,7 +58,8 @@
                         <th>Title</th>
                         <th>Category</th>
                         <th>Article Date</th>
-                        <th>Published</th> <!-- New Published Column -->
+                        <th>Published</th>
+                        <th>Actions</th> <!-- New Actions Column -->
                     </tr>
                 </thead>
                 <tbody>
@@ -72,10 +73,31 @@
                                 <!-- Link the category to the filtered articles page -->
                                 <a href="/articles?category=<%= article.category %>"><%= article.category %></a>
                             </td>
-                            <td><%= article.articleDate %></td>
+                            <td>
+                                <% if (article.articleDate) { %>
+                                    <%= new Date(article.articleDate).toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric'
+                                    }) %>
+                                <% } else { %>
+                                    N/A
+                                <% } %>
+                            </td>
+                            
+
                             <td class="<%= article.published ? 'text-success' : 'text-danger' %>">
                                 <%= article.published ? 'Yes' : 'No' %>
                             </td>
+                            <td>
+                                <!-- Edit Button -->
+                                <a href="/articles/edit/<%= article.id %>" class="btn btn-primary btn-sm">Edit</a>
+                                <!-- Delete Button -->
+                                <form action="/articles/<%= article.id %>?_method=DELETE" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </td>
+                            
                         </tr>
                     <% }); %>
                 </tbody>
