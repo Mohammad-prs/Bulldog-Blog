@@ -4,142 +4,99 @@
     Student Email: mparsafard@myseneca.ca
     File Name: content-service.js
     Date Created: October 14th, 2024
-    Last Modified: November 18th, 2024
+    Last Modified: December 11th, 2024
 */
 
-const fs = require('fs');
-const path = require('path');
+const { Pool } = require('pg');
 
-// Global arrays to store the data
-let articles = [];
-let categories = [];
+// PostgreSQL connection pool
+const pool = new Pool({
+    user: 'neondb_owner',
+    host: 'ep-bold-bird-a5a8yqsk.us-east-2.aws.neon.tech',
+    database: 'neondb',
+    password: 'spkQ7JImKiO0',
+    port: 5432,
+    ssl: { rejectUnauthorized: false }, 
+});
 
-// Function to initialize the data
+// Function to initialize the connection (optional for testing)
 function initialize() {
-    return new Promise((resolve, reject) => {
-        const articlesFilePath = path.resolve(__dirname, 'data', 'articles.json');
-        const categoriesFilePath = path.resolve(__dirname, 'data', 'categories.json');
+    return Promise.resolve('Database connected successfully');
+}
 
-        fs.readFile(articlesFilePath, 'utf8', (err, data) => {
-            if (err) {
-                reject('Unable to read articles file');
-            } else {
-                articles = JSON.parse(data);
-
-                fs.readFile(categoriesFilePath, 'utf8', (err, data) => {
-                    if (err) {
-                        reject('Unable to read categories file');
-                    } else {
-                        categories = JSON.parse(data);
-                        resolve();
-                    }
-                });
-            }
-        });
-    });
+// Function to get all articles
+function getAllArticles() {
+    return pool.query('SELECT * FROM articles')
+        .then(res => res.rows)
+        .catch(err => Promise.reject('No articles found'));
 }
 
 // Function to get only published articles
 function getPublishedArticles() {
-    return new Promise((resolve, reject) => {
-        const publishedArticles = articles.filter(article => article.published === true);
-        if (publishedArticles.length > 0) {
-            resolve(publishedArticles);
-        } else {
-            reject('No published articles found');
-        }
-    });
+    return pool.query('SELECT * FROM articles WHERE published = true')
+        .then(res => res.rows)
+        .catch(err => Promise.reject('No published articles found'));
 }
 
 // Function to get articles by category
 function getArticlesByCategory(category) {
-    return new Promise((resolve, reject) => {
-        const filteredArticles = articles.filter(article => article.category == category);
-        if (filteredArticles.length > 0) {
-            resolve(filteredArticles);
-        } else {
-            reject('No results returned');
-        }
-    });
+    return pool.query('SELECT * FROM articles WHERE category = $1', [category])
+        .then(res => res.rows)
+        .catch(err => Promise.reject('No results returned'));
 }
 
 // Function to get articles by minimum date
 function getArticlesByMinDate(minDateStr) {
-    return new Promise((resolve, reject) => {
-        const minDate = new Date(minDateStr);
-        const filteredArticles = articles.filter(article => new Date(article.articleDate) >= minDate);
-        if (filteredArticles.length > 0) {
-            resolve(filteredArticles);
-        } else {
-            reject('No results returned');
-        }
-    });
+    return pool.query('SELECT * FROM articles WHERE articleDate >= $1', [minDateStr])
+        .then(res => res.rows)
+        .catch(err => Promise.reject('No results returned'));
 }
 
 // Function to get an article by ID
 function getArticleById(id) {
-    return new Promise((resolve, reject) => {
-        const foundArticle = articles.find(article => article.id == id);
-        if (foundArticle) {
-            resolve(foundArticle);
-        } else {
-            reject('No results returned');
-        }
-    });
+    return pool.query('SELECT * FROM articles WHERE id = $1', [id])
+        .then(res => {
+            if (res.rows.length > 0) {
+                return res.rows[0];
+            } else {
+                throw new Error('No results returned');
+            }
+        })
+        .catch(err => Promise.reject(err.message));
 }
 
 // Function to get all categories
 function getCategories() {
-    return new Promise((resolve, reject) => {
-        if (categories.length > 0) {
-            resolve(categories);
-        } else {
-            reject('No categories found');
-        }
-    });
+    return pool.query('SELECT * FROM categories')
+        .then(res => res.rows)
+        .catch(err => Promise.reject('No categories found'));
 }
 
 // Function to add a new article
 function addArticle(articleData) {
-    return new Promise((resolve, reject) => {
-        articleData.published = articleData.published === "true";
-        articleData.id = articles.length + 1; // Assign a unique ID
-        articles.push(articleData);
-        resolve(articleData);
-    });
+    return pool.query(
+        'INSERT INTO articles (title, content, published, category, articleDate, featureImage) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+        [
+            articleData.title,
+            articleData.content,
+            articleData.published === 'true',
+            articleData.category,
+            articleData.articleDate,
+            articleData.featureImage || null
+        ]
+    )
+        .then(res => res.rows[0])
+        .catch(err => Promise.reject('Unable to add article'));
 }
-
-// Function to get all articles (without filtering by published status)
-// module.exports.getAllArticles = () => {
-//     return new Promise((resolve, reject) => {
-//         if (articles.length > 0) {
-//             resolve(articles);
-//         } else {
-//             reject('No articles found');
-//         }
-//     });
-// };
-
-function getAllArticles () {
-    return new Promise((resolve, reject) => {
-        if (articles.length > 0) {
-            resolve(articles);
-        } else {
-            reject('No articles found');
-        }
-    });
-
-}
-
 
 // Export the functions
 module.exports = {
     initialize,
+    getAllArticles,
     getPublishedArticles,
     getArticlesByCategory,
     getArticlesByMinDate,
     getArticleById,
     getCategories,
-    addArticle,
-    getAllArticles
+    addArticle
 };
