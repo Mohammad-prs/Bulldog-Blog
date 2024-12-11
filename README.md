@@ -1,37 +1,42 @@
-# Web322 Assignment
+Web322 Assignment
+Student Name: Mohammadreza Parsafard
+Student Number: 121755235
+Student Email: mparsafard@myseneca.ca
+Date Created: September 23th , 2024
+Last Modified: December 11th , 2024
 
-Student Name:  Mohammadreza Parsafard
-Student Number:  121755235
-Student Email:  mparsafard@myseneca.ca
-Date Created:  September 23th , 2024
-Last Modified: November 27th , 2024
+GITHUB URL: https://github.com/Mohammad-prs/Web322_Assignment_1
+VERCEL URL: https://web322-assignment-1-mfc3-git-master-mohammad-prs-projects.vercel.app/about
 
-GITHUB URL:  https://github.com/Mohammad-prs
-VERCEL URL:  https://web322-assignment-1-mfc3-git-master-mohammad-prs-projects.vercel.app/
+Technology Stack
+Frontend: HTML, CSS (Bootstrap 5), JavaScript, jQuery
+Backend: Node.js, Express.js
+Database: PostgreSQL (hosted on Neon.tech)
 
-### Technology Stack
-
-**Frontend**:  HTML, CSS (Bootstrap 5), JavaScript, jQuery
-**Backend**: Node.js, Express.js  
-**Database**:  Static JSON files (articles.json, categories.json)  
-
-### Notes
-
+Notes
 By submitting this as my assignment, I declare that this assignment is my own work in accordance with Seneca Academic Policy. No part of this assignment has been copied manually or electronically from any other source (including web sites) or distributed to other students.
 
-
-### how to use application
-
-1. Clone the repository and navigate to the project directory using bash:
-
+How to Use the Application
+Clone the repository and navigate to the project directory using bash:
 git clone https://github.com/Mohammad-prs/Web322_Assignment_1
 cd your repository name
+Install dependencies:
+npm install
+Configure the database credentials:
 
-2. npm install
+Create a .env file in the root directory.
 
-3. Run the application:
+Add the following variables with your Neon.tech database credentials:
 
-4.Access the Application:
+DB_USER=neondb_owner
+DB_HOST=ep-small-block-a5r0iz7y.us-east-2.aws.neon.tech
+DB_NAME=neondb
+DB_PASSWORD=mOBUMZe54uIS
+DB_PORT=5432
+Run the application:
+
+node server.js
+Access the application at the following routes:
 
 Home (Redirects to About): http://localhost:3243/
 About Page: http://localhost:3243/about
@@ -39,8 +44,27 @@ Articles List: http://localhost:3243/articles
 Categories List: http://localhost:3243/categories
 Add Article: http://localhost:3243/articles/add
 View Article: http://localhost:3243/article/:id (replace :id with a valid article ID)
+Edit Article: http://localhost:3243/articles/edit/:id (replace :id with a valid article ID)
+Neon.tech Integration
+The application is now integrated with a cloud-hosted PostgreSQL database on Neon.tech. This allows scalable and reliable database interactions, replacing the previous JSON-based storage system.
 
+Database Connection Details:
+The following credentials were used for the database configuration:
 
-### Features and Updates
+Connection String: postgresql://neondb_owner:mOBUMZe54uIS@ep-small-block-a5r0iz7y.us-east-2.aws.neon.tech/neondb?sslmode=require  
+User: neondb_owner  
+Host: ep-small-block-a5r0iz7y.us-east-2.aws.neon.tech  
+Database Name: neondb  
+Password: mOBUMZe54uIS  
+Port: 5432  
+Database Configuration:
+The database is configured using the pg library. A connection pool is established using the credentials provided in the .env file for secure database access. SSL is enabled for secure communication.
 
-This assignment enhances the previous functionality by introducing dynamic templating with EJS for rendering web pages. Static HTML pages such as about.html and addArticle.html were refactored into .ejs templates to dynamically render content. The articles.ejs page displays a list of articles in a styled table, with links for filtering by category and viewing individual article details. Similarly, the categories.ejs page dynamically displays all categories from categories.json, with each category linking to its corresponding filtered articles. A new route /article/:id and article.ejs page were added to display individual article details, including the title, content, category, and feature image (if available). Unpublished or invalid articles are handled with user-friendly error messages. The addArticle.ejs form was updated to dynamically populate the category dropdown with data from categories.json and now supports image uploads to Cloudinary. These improvements ensure a better user experience with dynamic data rendering and robust error handling.
+Features and Updates
+This assignment refactored the application to use a PostgreSQL database hosted on Neon.tech. Articles and categories are now stored in the database, enabling robust data management and scalability. Existing routes were updated to fetch data dynamically using SQL queries, and new routes were added for updating and deleting articles. The following key features were implemented:
+
+Database Integration: Articles and categories are now stored in a PostgreSQL database. JSON-based functions were refactored to SQL-based queries.
+Dynamic Pages: EJS templates dynamically render articles and categories with data from the database.
+Edit and Delete: Users can edit or delete articles directly from the UI. Changes are persisted to the database.
+Error Handling: User-friendly error messages are displayed for invalid requests or database errors.
+Responsive Design: The application uses Bootstrap for styling, ensuring a responsive and user-friendly interface.
