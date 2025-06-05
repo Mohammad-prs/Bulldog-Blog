@@ -67,7 +67,7 @@ A dynamic content management system (CMS) blog app built using **Node.js**, **Ex
 
 ---
 
-
+⚠️ Note: This project is for demonstration purposes. Some dependencies may be outdated due to recent advisories. Always run `npm audit fix` after cloning.
 
 ## 👤 Author
 
